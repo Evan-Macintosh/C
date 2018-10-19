@@ -1,42 +1,44 @@
-/*This program takes in two arguments: 
-*1) size of an array to create
-*2) number of probability iterations to go through on the array.
-*In each iteration the program picks a random number 0<x<1, inclusive and 
+/*Written by: Dr.Poopenstein
+*In each iteration the program picks a random number 0 to 1, inclusive and 
 *determines which cell in the array was selected. After selection, the probability 
-*that cell is selected again is cut in half with that half then being distributed
-*amongst the other cells.
+*of that cell is cut in half with that half then being distributed amongst 
+*the other cells; the divided out half is divided by n-1 and added to the cells.
 *
-*Written by: Dr. Poopenstein
-*
+*	>>>>>KNOWN ISSUES<<<<<
+*	>>>>>	         <<<<<
 *Conception: April 2017
 */
 #include <stdio.h>
 #include <stdlib.h>
+void make_choice(double *chances_ptr, int *array_size_ptr);
+void initialize_array(double *chances_ptr, int *array_size_ptr);
+void assign_probabilities(double *chances_ptr, int *array_size_ptr, int selected);
+void print_array(double *chances_ptr, int *array_size_ptr);
 
-void main (int argc, char** argv[]){
-	if (atoi(argv[1] < 1 && atoi(argv[2] < 4)){exit_func(); //if the requested size is less than 1 and no. of steps < 4
-		exit_func_error(12);		
-	}else{
-		int array_size = atoi(argv[1]);		//save the command line int
-		int iteration_steps = atoi(argv[2]);	//save the command line int
-		int i = 0;				//loop control variable
+void main (int argc, char *argv){
+	int array_size, iteration_steps = 0;	
 
-		//create an array of doubles size = commandline arg
-		double [] chances = calloc (sizeof double * array_size) ;
-		
-		//>>>>>Check type declaration used with pointers<<<<<
-		register int chances_ptr = &chances[0];		//pointer to the array, stored in a register to improve access times
-		register int array_size_ptr = &array_size_ptr;	//pointer to array_size
+	printf("Enter the array size:");
+	scanf("%d", &array_size);
 
-		initialize_array(&chances_ptr, &array_size_ptr);	//redundant with calloc?
+	printf("\nEnter the # of iterations:");
+	scanf("%d", &iteration_steps);
 
-		while (iteration_steps != 0){	//while the counter isnt 0
-			make_choice(&chances_ptr, &array_size_ptr);	//call the function that picks an index
+	//initialize an array of `array_size` doubles to 0.0
+	double* chances_ptr = (double*) malloc(array_size * sizeof(double));
+	int* array_size_ptr = &array_size;			//pointer to array_size
 
-			--iteration_steps;	//update the counter
-		}
-		exit_func();	//go to exit
+	initialize_array(chances_ptr, array_size_ptr);		//fill the array with default values (1/size)
+
+	while (iteration_steps != 0){	//while the counter isnt 0
+		make_choice(chances_ptr, array_size_ptr);	//call the function that picks an index
+
+		--iteration_steps;	//update the counter
 	}
+	print_array(chances_ptr, array_size_ptr);
+	
+	free(chances_ptr);	//unnecessary, but good practice
+	exit(0);	//exit
 }
 
 
@@ -45,23 +47,24 @@ void main (int argc, char** argv[]){
 * Or simply put: the sum of probabilties thus far with the maximum value
 *arguments in:
 * pointer to first cell of chances[]
-*
+* pointer to size of the array
 *return values:  
 *
 */
-void make_choice(int *chances_ptr, int *array_size_ptr){
-	double sum = 0.0;	//used for the lower bounds 
-	int selection = -1;
-	int i=0;	//loop control
-	double random_choice = rand()/(double)RAND_MAX;	//generate random number
-	for(i;i < *array_size_ptr; i++){//use for loop to...	
-		if (sum < random_choice && random_choice<= sum+=(*chances_ptr)){	//determine if the random number references the current index
-			printf("The selected cell was: %d\nwith a discrete probability: %f\nand cont. probability: %f", i, *chances_ptr+i, sum);
+void make_choice(double *chances_ptr, int *array_size_ptr){
+	register double sum = 0.0;	//used for the lower bounds 
+	int selection = 2756123;	//intially used as seed value for random number generation
+	int i=0;			//loop control
+	register double random_choice = (double)rand()/(double)RAND_MAX;		//generate random number 0 to 1 inclusive
+
+	for(i;i < *array_size_ptr; i++){	//use for loop to...	
+		if (sum < random_choice && random_choice <= sum+(*chances_ptr)){	//determine if the random number references the current index
+//			printf("The selected cell was: %d\nwith a discrete probability: %f\n", i, *chances_ptr+i);
 			
-			//pass in the array base pointer, array size pointer, and selected index
-			assign_probabilities(&chances_ptr, &array_size_ptr, i);	//go to assign_probabilities 
-			break;
+			assign_probabilities(chances_ptr, array_size_ptr, i);		//go to assign_probabilities 
+			return;
 		}	
+		sum+=(*chances_ptr);		//update sum
 	}
 }		
 
@@ -74,13 +77,14 @@ void make_choice(int *chances_ptr, int *array_size_ptr){
 *return values:
 *
 */
-void initialize_array(int *chances_ptr, int *array_size_ptr){
-	double probability = 1 / *array_size_ptr;		//setting the upper bounds for each index (using a decimal)
+void initialize_array(double *chances_ptr, int *array_size_ptr){
+	register double probability = 1.0 / *array_size_ptr;		//setting the upper bounds for each index (using a decimal)
 	int i=0;
 	for (i; i < *array_size_ptr; i++){
-		*(chances_ptr + i)= probability;	//using pointer arithmetic, point to the ith index and set its upper bounds
+		*(chances_ptr+i) = probability;		//using pointer arithmetic, point to the ith index and set its upper bounds
 	}
 }
+
 
 /*This method reassigns the probability of all cells in the matrix. This is done like so:
 * divide the selected probability in half and restore in matrix; save old probability to variable
@@ -94,24 +98,36 @@ void initialize_array(int *chances_ptr, int *array_size_ptr){
 *return values:
 *
 */
-void assign_probabilities(int *chances_ptr, int *array_size_ptr, int selected){
-	int i=0;
+void assign_probabilities(double *chances_ptr, int *array_size_ptr, int selected){
+	register int i=0;
 	register double additive = (*(chances_ptr + selected)/2)/ *array_size_ptr;	//initialize the number to be added to non selected cells
-	*(chances_ptr + selected)/=2 ;			//update the selected cell's probability
+	*(chances_ptr + selected)/= 2;			//update the selected cell's probability
 	
 	for (i; i < *array_size_ptr; i++){
 		if (i != selected){
-			*(chances_ptr + i)+= additive;	//using pointer arithmetic to access cells, reassign probabilities 
+			*(chances_ptr + i)+= additive;	//using "pointer arithmetic" to access cells, reassign probabilities 
 		}
 	}
 }
 
-void exit_func(){
-	printf("Exiting program\n");
-	exit(0);
-}
 
-void exit_func_error(int err_no){
-	printf("Error %d, exiting.", err_no);
-	exit(0);
+/*Prints the contents of the array; optionally summates the probabilities to 
+* see how close to 1 you get. (Uncomments the lines below to access summation)
+*
+*arguments in:
+*pointer to array
+*pointer to array size
+*
+*return values:
+*
+*/
+void print_array(double *chances_ptr, int *array_size_ptr){
+	register int i=0;
+//	register double sum = 0.0;
+	printf("\n");
+	for(i; i< *array_size_ptr; i++){
+		printf("chances[%d]\t=  %f  \n",i, *(chances_ptr+i));	//prints the probability
+//		sum +=*(chances_ptr +i);
+	}
+//	printf("Total probability: %f\n",sum);
 }
