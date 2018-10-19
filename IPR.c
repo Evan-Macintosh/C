@@ -1,4 +1,5 @@
-/*Written by: Dr.Poopenstein
+/*Inverse Probability Relation algorithm
+*Written by: Dr.Poopenstein
 *In each iteration the program picks a random number 0 to 1, inclusive and 
 *determines which cell in the array was selected. After selection, the probability 
 *of that cell is cut in half with that half then being distributed amongst 
