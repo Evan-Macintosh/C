@@ -1,0 +1,106 @@
+SAVC - Summative Average Vector Conjecture
+Inception: March 2016
+
+Conjecture:
+For a group of points on a graph (A, B, C) with distance α between them, 
+there exists a point (D; and subsequent points E, F, G, etc.) with distance
+between it and previous points A, B, and C labeled β, γ, and δ where the 
+equality α = (3α + β + γ + δ)/6. For each successive point, it can be 
+said the same is true.
+
+Solution:
+Build a program that uses algebra and mathematical relations to "intelligently"
+find points in 2D space and saves the new point(s) and the distances between it and
+all previous points.
+
+Further Notes:
+>To store the individual points, create a dynamic array of Point objects that have an X and Y 
+coordinate for each point.
+>To store distances between each point, create a supplementary 2D dynamic array where each 
+index is a double that holds the distance from (Point X) to (Point Y).
+eg: distance_vectors[0][3] would hold the distance between the 0th point and the 3rd point (using Pythagorean theorem).
+    distance_vectors[2][2] would hold 0 (or null) to indicate it has no distance value because
+	it would be checking distance to itself.
+	distance_vectors[3][0] would hold the same value as [0][3]; Vector summation method would need to account for this 
+
+	
+	
+>>>>>UML<<<<<
+---SAVC---
+final a = 3; //original distance
+points: Point[]
+points_vectors: double[][]
+Point(x_coord: double, y_coord: double)	
+	
+main(): void
+summate_vectors(points*: Point[]): double
+find_point(points*: Point[]): 
+set_vector(points_vectors: double[][]):
+get_vector(r: int, c: int): double
+make_vector(point_a* : Point, point_b* : Point):double
+add_point(points*: Point[], new_point: Point):
+
+---Point---
+Point(x_coord: double, y_coord: double)
+get_x_coord(): double
+get_y_coord(): double
+set_x_coord(x_coord: double): 
+set_y_coord(y_coord: double): 
+
+
+~~~~~Main Methods~~~~~
+main():
+Create the initial array of 3 Point objects. Run a loop for finding points until a 
+given condition is met (whether its a certain number of new points or keyboard input).
+
+summate_vectors(points_vectors: double[][]): double
+iterate through the array of vectors and add all the distance vectors together. 
+Takes in a pointer to the array of Point objects. Returns the average distance 
+in the form of a double. Since some of the indices are duplicates, loop like the following:
+
+size = points_vectors.length();
+for(int r =1; r<size; r++){
+	for(int c = r+1; c<size; c++){
+	}
+}
+
+find_point(points*: Point[]):
+Contains a majority of the code; this method uses rules set forth by algebra to find 
+possible locations for the next point. Takes in a pointer to the array of Point 
+objects and passes the newly found/created Point object to add_point() for adding it to 
+the collection.
+
+set_vector(points_vectors: double[][], vector: double):
+Sets the vector between two points. The vector is found by the absolute value of 
+the Pythagorean theorem. The second parameter is actually the return value from
+a make_vector() call.
+
+get_vector(r: int, c: int): double
+A method that looks at points_vectors[r][c] and returns the given distance vector.
+
+make_vector(point_a* : Point, point_b* : Point): double
+This method gets the respective X and Y coordinates of the objects and using the
+Pythagorean Theorem, calculates the distance between the two points and returns it. 
+The double returned from this function is used in set_vector().
+
+add_point(points*: Point[], new_point: Point):
+Here we take in the pointer to the collection of Point objects, resize it to be n+1 in 
+size, and add a pointer to the new_point object in the last index. Reset the object array
+pointer to the new array.
+
+
+~~~~~Point Methods~~~~~
+Point(x_coord: double, y_coord: double)
+Constructor for the Point object
+
+get_x_coord(): double
+Returns the x coordinate for a given Point object
+
+get_y_coord(): double
+Returns the y coordinate for a given Point object
+
+set_x_coord(x_coord: double): 
+Sets the x coordinate for a given Point object
+
+set_y_coord(y_coord: double): 
+Sets the y coordinate for a given Point object
