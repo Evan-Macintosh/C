@@ -2,13 +2,16 @@
 * and divided by the number of points (including itself), the average distance remains "the same" 
 * (within a certain margin of error)
 *
+* single tear for no explicit lambda functions in C {FUCK}
 */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include "point.h"	//include the header file about the Point struct
-
+#define ACCEPT 0.00001
+#define RTD (180.0/3.1415926535)	//radian to degree conversion
+#define DTR	(3.1415926535/180.0)	//degree to radian conversion
 double summate_vectors(double points_vectors;
 void find_point(Point[] *points); 
 void set_vector(int r, int c, double points_vectors);
@@ -19,20 +22,38 @@ int calculate_triangular_number(int number);
 int calculate_cell(int r, int c);
 		       
 int points_total = 3;							//create a global integer to track the number of points
-const double deviation_of_acceptance=0.00001;	//a double representing how close we want to come to the average when creating a new point
+const double deviation_of_acceptance=ACCEPT;	//a double representing how close we want to come to the average when creating a new point
 
 main(void){
-	//create the array of type Point
-	//create the 3 original Point structs
-	//create the 3x3 "2d" array of vectors bewteen the points
-	//populate the distance vector array 
-	const double avg_distance = summate_vectors(&points)/3;		//an immutable double equal to the original distance
+	Point* points = (Point*) malloc(points_total * sizeof(Point));	//create an array of Point pointers that point to structs
+	/*initialize the three point positions*/
+	*(points+0).x_coord=0.0;
+	*(points+0).y_coord=0.0;
+	*(points+1).x_coord=3.0;
+	*(points+1).y_coord=0.0;
+	*(points+2).x_coord=1.5;	
+	*(points+2).y_coord=(1.5/sin(30.0)*sin(60.0))* RTD;	//the y position using the law of sines
+	/*				>>><<<				*/
+	double* points_vectors = (double*) malloc(3 * sizeof(double));//create the array of vectors bewteen the points
 	
+	int end_run=0;
+	printf("Enter a maximum number of points to find:");
+	scanf ("%d", &end_run);
+	/*Setting the initial distances */
+	set_vector(0,1, points_vectors, 3.0);	//distance between points[0] and points[1]
+	set_vector(0,2, points_vectors, 3.0);	//" " points[0] and points[2]
+	set_vector(1,2, points_vectors, make_vector(*(points+1), *(points+2)));	//" " points[1] and points[2]
+	/*			>>>>><<<<<			*/
+	
+	const double avg_distance = summate_vectors(&points)/3.0;		//an immutable double equal to the original distance
+	
+	while(points_total < end_run){
+		find_point(points, points_vectors);
+	}
 	
 } 
 
-/*This method takes the array of Point structs and adds up all the distances
-* between them (with help from get_vector)
+/*This method takes the array of Point structs and adds up all the distances between them (with help from get_vector)
 * 
 *arguments in:
 * pointer to the array of distance vectors
@@ -41,8 +62,8 @@ main(void){
 * the total distance of the distance vectors
 */
 double summate_vectors(double *points_vectors){	
-	register int c=0;	//loop control
-	register double sum = 0.0;	//sum of the vectors
+	register int c=0;				//loop control
+	register double sum = 0.0;		//sum of the vectors
 	for(c; c< points_total; c++){	//iterate accross the array of vectors
 		sum += *(points_vectors+c);	//update the sum
 	}
@@ -57,12 +78,38 @@ double summate_vectors(double *points_vectors){
 *return values:  
 *
 */
-void find_point(Point[] *points, double *points_vectors){
-	//math stuff
+void find_point(Point[] *points, double *points_vectors){	//possible recursive definition (or helper function) to help determine appropriate new point
+	int r=0;
+	int c=0;
+	int i=0;	//used for setting the index of the position
+	int new_index = points_total+1;			//the index(id) of the new point
+	struct Point new_point = (Point*) malloc(points_total * sizeof(Point));
+	
+	//math stuff; possible recursion
 	//confirm result
-	//add it to the array of Point structs
-	//get its distance between all other points
-	//put its distance in the distance array
+	
+	add_point(points, new_point);		//add it to the array of Point structs
+	
+	/*"swap" the arrays*/
+	temp_array = &points_vectors;
+	new_vectors = (double*) malloc(points_total * sizeof(double));//resize the distance array; put its distance in the distance array
+	
+	
+	
+	for(r; r<points_total-2; r++){				//go from 0 to X(as you by definition cannot go to the last row; check SAVC_mapping.txt)
+		for(c=r+1;c< points_total-1; c++){		//go from 1 to X+1
+			i=calculate_cell(r,c);		//get the position of the point in the "old array"
+			*(new_vectors+i)=get_vector(r, c, points_vectors)	//reconstruct the distance array; transferring the 
+		}
+	}
+	r=0;
+	/*add the new points*/
+	for (r; r<points_total-1; r++){	
+		i=calculate_cell(r,c);		//get the position of the point in the "old array"
+		*(new_vectors+i)=make_vector(new_point, *(points+r))	//add the new vectors to the array
+	}
+	/**/	//{use for later} r, c, *new_vectors, make_vector(*(points + r),*(points + c)
+	points_vectors=&new_vectors;	//switch the arrays
 }
 
 /*This function sets the distance between two points in the array of vectors
@@ -72,7 +119,7 @@ arguments in:
 * a pointer to the vector array
 * the vector to be added
 *return values: 
-* none
+* 
 */
 void set_vector(int r, int c, double *points_vectors, double distance){
 	*(points_vectors + calculate_cell(r,c)) = distance;
@@ -114,10 +161,10 @@ double make_vector(Point *point_a, Point *point_b){
 *arguments out:
 *
 */
-void add_point(Point[] *points, Point new_point){
+void add_point(Point[] *points, Point new_point){//possibly have return type Point[] or Point* pointing to array of structs
 	//create a new array 
 	//re-calculate the distance between the new point and the other points and make a new 1D array
-	
+	//repoint points
 	points_total++;	//incriment the point counter
 }
 				 
