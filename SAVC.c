@@ -1,17 +1,19 @@
-/*This program finds successive points that when its distance between previous points is calculated
+/*gcc -O3 SAVC.c -o SAVC.x -lm
+* This program finds successive points that when its distance between previous points is calculated
 * and divided by the number of points (including itself), the average distance remains "the same" 
-* (within a certain margin of error)
+* (within a certain margin of error). 
+* To understand how the points are stored, see SAVC_mapping
 *
-* single tear for no explicit lambda functions in C {FUCK}
+* single tear for no explicit lambda functions in C 
 */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "point.h"	//include the header file about the Point struct
+#include "point.h"					//include the header file about the Point struct
 #define ACCEPT 0.00001
-#define RTD (180.0/3.1415926535)	//radian to degree conversion
-#define DTR	(3.1415926535/180.0)	//degree to radian conversion
+#define RTD (180.0/3.1415926535)	//radian to degree conversion 
+#define DTR	(3.1415926535/180.0)	//degree to radian conversion; these might be used for trigonometric laws
 double summate_vectors(double points_vectors;
 void find_point(Point[] *points); 
 void set_vector(int r, int c, double points_vectors);
@@ -32,20 +34,20 @@ main(void){
 	*(points+1).x_coord=3.0;
 	*(points+1).y_coord=0.0;
 	*(points+2).x_coord=1.5;	
-	*(points+2).y_coord=(1.5/sin(30.0)*sin(60.0))* RTD;	//the y position using the law of sines
+	*(points+2).y_coord=(1.5/sin(30.0)*sin(60.0))* RTD;				//the y position using the law of sines
 	/*				>>><<<				*/
-	double* points_vectors = (double*) malloc(3 * sizeof(double));//create the array of vectors bewteen the points
+	double* points_vectors = (double*) malloc(3 * sizeof(double));	//create the array of vectors bewteen the points
 	
 	int end_run=0;
 	printf("Enter a maximum number of points to find:");
 	scanf ("%d", &end_run);
 	/*Setting the initial distances */
-	set_vector(0,1, points_vectors, 3.0);	//distance between points[0] and points[1]
-	set_vector(0,2, points_vectors, 3.0);	//" " points[0] and points[2]
+	set_vector(0,1, points_vectors, 3.0);									//distance between points[0] and points[1]
+	set_vector(0,2, points_vectors, 3.0);									//" " points[0] and points[2]
 	set_vector(1,2, points_vectors, make_vector(*(points+1), *(points+2)));	//" " points[1] and points[2]
 	/*			>>>>><<<<<			*/
 	
-	const double avg_distance = summate_vectors(&points)/3.0;		//an immutable double equal to the original distance
+	const double avg_distance = summate_vectors(&points)/3.0;				//an immutable double equal to the original distance
 	
 	while(points_total < end_run){
 		find_point(points, points_vectors);
@@ -81,7 +83,7 @@ double summate_vectors(double *points_vectors){
 void find_point(Point[] *points, double *points_vectors){	//possible recursive definition (or helper function) to help determine appropriate new point
 	int r=0;
 	int c=0;
-	int i=0;	//used for setting the index of the position
+	int i=0;								//used for setting the index of the position
 	int new_index = points_total+1;			//the index(id) of the new point
 	struct Point new_point = (Point*) malloc(points_total * sizeof(Point));
 	
@@ -193,10 +195,10 @@ int calculate_triangular_number(int n){
 int calculate_cell(int r, int c){
 	if (c<=r){return calculate_cell(c,r);}	//if it would reference a "duplicate" value, return the correct value
 	else{
-		if (r!=0){	//if you are not in the "top row"
+		if (r!=0){							//if you are not in the "top row"
 			//recursively add the amount of valid cells from the above row of the 2D array
 			return (points_total-r-1)+calculate_cell(r-1,c);	
 		}
-		return c-1;	//base case;you are in the top row/you cannot recursively define further, otherwise you go out-of-bounds
+		return c-1;							//base case;you are in the top row/you cannot recursively define further, otherwise you go out-of-bounds
 	}
 }				 	 

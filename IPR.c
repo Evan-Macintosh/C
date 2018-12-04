@@ -1,4 +1,5 @@
-/*Inverse Probability Relation algorithm
+/*gcc -O3 IPR.c -o IPR.x -lm
+*Inverse Probability Relation algorithm
 *Written by: Dr.Poopenstein
 *In each iteration the program picks a random number 0 to 1, inclusive and 
 *determines which cell in the array was selected. After selection, the probability 
@@ -27,19 +28,19 @@ void main (int argc, char *argv){
 
 	//initialize an array of `array_size` doubles to 0.0
 	double* chances_ptr = (double*) malloc(array_size * sizeof(double));
-	int* array_size_ptr = &array_size;			//pointer to array_size
+	int* array_size_ptr = &array_size;					//pointer to array_size
 
 	initialize_array(chances_ptr, array_size_ptr);		//fill the array with default values (1/size)
 
-	while (iteration_steps != 0){	//while the counter isnt 0
-		make_choice(chances_ptr, array_size_ptr);	//call the function that picks an index
+	while (iteration_steps != 0){						//while the counter isnt 0
+		make_choice(chances_ptr, array_size_ptr);		//call the function that picks an index
 
-		--iteration_steps;	//update the counter
+		--iteration_steps;								//update the counter
 	}
 	print_array(chances_ptr, array_size_ptr);
 	
-	free(chances_ptr);	//unnecessary, but good practice
-	exit(0);	//exit
+	free(chances_ptr);									//unnecessary, but good practice
+	exit(0);											//exit
 }
 
 
@@ -53,19 +54,18 @@ void main (int argc, char *argv){
 *
 */
 void make_choice(double *chances_ptr, int *array_size_ptr){
-	register double sum = 0.0;	//used for the lower bounds 
-	int selection = 2756123;	//intially used as seed value for random number generation
-	int i=0;			//loop control
-	register double random_choice = (double)rand()/(double)RAND_MAX;		//generate random number 0 to 1 inclusive
+	register double sum = 0.0;											//used for the lower bounds 
+	srand(time(0));														//seed the random number generation
+	register int i=0;													//loop control
+	register double random_choice = (double)rand()/(double)RAND_MAX;	//generate random number 0 to 1 inclusive
 
 	for(i;i < *array_size_ptr; i++){	//use for loop to...	
-		if (sum < random_choice && random_choice <= sum+(*chances_ptr)){	//determine if the random number references the current index
+		if (sum <= random_choice && random_choice < sum+(*chances_ptr)){//determine if the random number references the current index
 //			printf("The selected cell was: %d\nwith a discrete probability: %f\n", i, *chances_ptr+i);
-			
 			assign_probabilities(chances_ptr, array_size_ptr, i);		//go to assign_probabilities 
 			return;
 		}	
-		sum+=(*chances_ptr);		//update sum
+		sum+=(*chances_ptr+i);		//update sum
 	}
 }		
 
@@ -79,10 +79,10 @@ void make_choice(double *chances_ptr, int *array_size_ptr){
 *
 */
 void initialize_array(double *chances_ptr, int *array_size_ptr){
-	register double probability = 1.0 / *array_size_ptr;		//setting the upper bounds for each index (using a decimal)
-	int i=0;
+	register double probability = 1.0 / *array_size_ptr;	//setting the upper bounds for each index (using a decimal)
+	register int i=0;
 	for (i; i < *array_size_ptr; i++){
-		*(chances_ptr+i) = probability;		//using pointer arithmetic, point to the ith index and set its upper bounds
+		*(chances_ptr+i) = probability;						//using pointer arithmetic, point to the ith index and set its upper bounds
 	}
 }
 
@@ -101,12 +101,12 @@ void initialize_array(double *chances_ptr, int *array_size_ptr){
 */
 void assign_probabilities(double *chances_ptr, int *array_size_ptr, int selected){
 	register int i=0;
-	register double additive = (*(chances_ptr + selected)/2)/ *array_size_ptr;	//initialize the number to be added to non selected cells
-	*(chances_ptr + selected)/= 2;			//update the selected cell's probability
+	register double additive = (*(chances_ptr + selected)/2.0)/ *array_size_ptr;//initialize the number to be added to non selected cells
+	*(chances_ptr + selected)/= 2.0;											//update the selected cell's probability
 	
 	for (i; i < *array_size_ptr; i++){
 		if (i != selected){
-			*(chances_ptr + i)+= additive;	//using "pointer arithmetic" to access cells, reassign probabilities 
+			*(chances_ptr + i)+= additive;										//reassign probabilities 
 		}
 	}
 }
@@ -124,11 +124,11 @@ void assign_probabilities(double *chances_ptr, int *array_size_ptr, int selected
 */
 void print_array(double *chances_ptr, int *array_size_ptr){
 	register int i=0;
-//	register double sum = 0.0;
+	register double sum = 0.0;
 	printf("\n");
 	for(i; i< *array_size_ptr; i++){
-		printf("chances[%d]\t=  %f  \n",i, *(chances_ptr+i));	//prints the probability
-//		sum +=*(chances_ptr +i);
+//		printf("chances[%d]\t=  %f  \n",i, *(chances_ptr+i));	//prints the probability
+		sum += *(chances_ptr +i);
 	}
-//	printf("Total probability: %f\n",sum);
+	printf("Total probability: %f\n",sum);
 }
