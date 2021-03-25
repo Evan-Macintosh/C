@@ -7,7 +7,7 @@ An algorithm I developed that is to be further implemented in a system where div
 
 
 ### SAVC
-An algorithm I concieved to find points within certain constraints on a 2D plane. Abstraction to 3D is possible.
+An algorithm I concieved to find points within certain constraints on a 2D plane. Extension to 3D is possible.
 
 ### matrix_change.c
 A fun project and collections of algorithms to swap Row-major and Column-major arrays. Might have use down the line in systems programming.
